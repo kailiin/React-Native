@@ -11,7 +11,5 @@
 - Des animations pour customiser application.
 
 
-
-![Screenshot](./assets/git_search.png)
-![Screenshot](./assets/git_favorite.png)
-![Screenshot](./assets/git_detail.png)
+#
+![Screenshot](./assets/git_s_f_d.png)
