@@ -23,7 +23,7 @@ function SearchStackNavigator() {
 			<SearchStack.Screen
 				name = "FilmDetail"
 				component = {FilmDetail}
-				options = {({route}) => ({title: route.params.name}) }
+				options = {({navigation, route}) => ({title: route.params.name}) }
 			/>
 		</SearchStack.Navigator>
 	);
@@ -40,7 +40,7 @@ function FavoriteStackNavigator() {
 			<SearchStack.Screen
 				name = "FilmDetail"
 				component = {FilmDetail}
-				options = {({route}) => ({title: route.params.name}) }
+				options = {({navigation, route}) => ({title: route.params.name}) }
 			/>
 		</FavoriteStack.Navigator>
 	)
@@ -51,7 +51,7 @@ export default function Navigation() {
 	  <NavigationContainer>
 		<Tab.Navigator>
 			<Tab.Screen
-				name = "Search"
+				name = "TabSearch"
 				component = {SearchStackNavigator}
 				options= {{
 					title: "Recherche", 
@@ -66,7 +66,7 @@ export default function Navigation() {
 				}}
 			/>
 			<Tab.Screen
-				name = "Favorites"
+				name = "TabFavorites"
 				component = {FavoriteStackNavigator}
 				options= {{
 					title: "Favoris",
