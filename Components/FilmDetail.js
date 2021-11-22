@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, ActivityIndicator, ScrollView, View, Image, TouchableOpacity} from 'react-native'
+import { Text, ActivityIndicator, ScrollView, View, Image, TouchableOpacity, Platform, Share} from 'react-native'
 import { getImageFromApi, getFilmsDetailWithID } from '../API/TMDBApi'
 import { StyleSheet} from 'react-native'
 import moment from 'moment';
 import numeral from 'numeral';
 import { connect } from 'react-redux'
+import EnlargeShrink from '../Animations/EnlargeShrink';
 
 class FilmDetail extends React.Component {
 	constructor(props) {
@@ -16,6 +17,19 @@ class FilmDetail extends React.Component {
 	}
 
 	componentDidMount() {
+		if (Platform.OS === 'ios') {
+			this.props.navigation.setOptions({
+				headerRight: () => (
+					<TouchableOpacity
+					onPress={() => this._shareFilm()}>
+					<Image
+						style={styles.share_image}
+						source={require('../Images/ic_share.ios.png')}/>
+				</TouchableOpacity>
+				)
+			})
+		}
+
 		const favoriteFilmIndex = this.props.favoritesFilm.findIndex(item => item.id === this.props.route.params.filmID)
 		if (favoriteFilmIndex !== -1) {
 			this.setState({
@@ -42,20 +56,45 @@ class FilmDetail extends React.Component {
 		}
 	}
 
+	_shareFilm() {
+		const { film } = this.state
+		Share.share({ title: film.title, message: film.overview})
+	}
+
+	_displayShareButtonAndroid() {
+		const { film } = this.state
+		if (film != undefined && Platform.OS === 'android') {
+			return (
+				<TouchableOpacity
+					style={styles.share_toucheble_floating}
+					onPress={() => this._shareFilm()}>
+				<Image
+					style={styles.share_image}
+					source={require('../Images/ic_share.android.png')}/>
+				</TouchableOpacity>
+			)
+		}
+	}
+
 	_toggleFavorite() {
 		const action = { type: "TOGGLE_FAVORITE", value: this.state.film}
 		this.props.dispatch(action)
 	}
 
 	_displayFavoriteImage() {
+		var shouldEnlarge = false
 		var sourceImage = require('../Images/ic_favorite_border.png')
-		if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1)
+		if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
 			sourceImage = require('../Images/ic_favorite.png')
+			shouldEnlarge = true
+		}
 		return(
-			<Image
-				style={styles.favorite_image}
-				source={sourceImage}
-			/>
+			<EnlargeShrink shouldEnlarge={shouldEnlarge}>
+				<Image
+					style={styles.favorite_image}
+					source={sourceImage}
+				/>
+			</EnlargeShrink>
 		)
 	}
 
@@ -86,6 +125,7 @@ class FilmDetail extends React.Component {
 					<Text style={styles.other_text}>Companie(s) : {film.production_companies.map(
 						function(companie) {return companie.name}).join(' / ')}
 					</Text>
+					{this._displayShareButtonAndroid()}
 				</ScrollView>
 			)
 		}
@@ -147,8 +187,24 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	favorite_image: {
-		width: 40,
-		height: 40
+		flex: 1,
+		width: null,
+		height: null
+	},
+	share_toucheble_floating:{
+		position: 'absolute',
+		width: 60,
+		height: 60,
+		right: 30,
+		bottom: 30,
+		borderRadius: 30,
+		backgroundColor: 'red',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	share_image: {
+		width:30,
+		height:30
 	}
 })
 
